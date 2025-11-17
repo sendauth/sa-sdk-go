@@ -23,7 +23,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```go
-import sa-sdk-go "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+import sa-sdk-go "github.com/sendauth/sa-sdk-go"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:

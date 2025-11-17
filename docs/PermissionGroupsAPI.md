@@ -29,7 +29,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+	openapiclient "github.com/sendauth/sa-sdk-go"
 )
 
 func main() {
@@ -95,7 +95,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+	openapiclient "github.com/sendauth/sa-sdk-go"
 )
 
 func main() {
@@ -163,7 +163,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+	openapiclient "github.com/sendauth/sa-sdk-go"
 )
 
 func main() {
@@ -224,7 +224,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+	openapiclient "github.com/sendauth/sa-sdk-go"
 )
 
 func main() {
@@ -296,7 +296,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go/sa-sdk-go"
+	openapiclient "github.com/sendauth/sa-sdk-go"
 )
 
 func main() {

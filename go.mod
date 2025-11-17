@@ -1,4 +1,4 @@
-module github.com/sendauth/sa-sdk-go/sa-sdk-go
+module github.com/sendauth/sa-sdk-go
 
 go 1.23
 
