@@ -1,0 +1,2551 @@
+openapi: 3.1.0
+info:
+  contact:
+    name: SendAuth Support
+    url: https://sendauth.com
+  description: Authentication and identity management API for SendAuth platform
+  title: SendAuth API
+  version: 1.0.0
+servers:
+- url: https://api.sendauth.com
+security:
+- basic: []
+tags:
+- description: Audit log operations
+  name: Audits
+- description: Approval group operations
+  name: Approval Groups
+- description: Company management operations
+  name: Companies
+- description: Permission management
+  name: Permissions
+- description: Permission group management
+  name: Permission Groups
+- description: Routing rule management
+  name: Routing Rules
+- description: Organization settings management
+  name: Settings
+- description: Tag management
+  name: Tags
+- description: Authentication transaction management
+  name: Transactions
+- description: User management operations
+  name: Users
+- description: Webhook management
+  name: Webhooks
+paths:
+  /api/v1/users:
+    get:
+      description: Get paginated list of users
+      operationId: listUsers
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: permission
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: sortBy
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: sortDir
+        required: false
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsers"
+          description: List of users
+        "500":
+          description: Internal server error
+      summary: List users
+      tags:
+      - Users
+    post:
+      description: Create a new user
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: User created
+        "403":
+          description: Insufficient permissions
+        "422":
+          description: User already exists
+      summary: Create user
+      tags:
+      - Users
+  /api/v1/users/deleted:
+    get:
+      description: Get paginated list of deleted users
+      operationId: listDeletedUsers
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: permission
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsers"
+          description: List of deleted users
+      summary: List deleted users
+      tags:
+      - Users
+  /api/v1/users/{userID}:
+    delete:
+      description: Soft delete a user
+      operationId: deleteUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: User deleted
+        "403":
+          description: Cannot delete own account
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      description: Get user details by ID
+      operationId: getUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: User details
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get user
+      tags:
+      - Users
+    put:
+      description: Update user details
+      operationId: updateUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: User updated
+        "403":
+          description: Insufficient permissions
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      summary: Update user
+      tags:
+      - Users
+  /api/v1/users/{userID}/tags:
+    put:
+      description: Set user tags for a specific user
+      operationId: setUserTags
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagsRequest"
+        required: false
+      responses:
+        "200":
+          description: Tags updated
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Set user tags
+      tags:
+      - Users
+  /api/v1/users/{userID}/transactions:
+    get:
+      description: Get paginated list of transactions for a user
+      operationId: getUserTransactions
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedTransactions"
+          description: List of user transactions
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get user transactions
+      tags:
+      - Users
+  /api/v1/users/{userID}/audits:
+    get:
+      description: Get paginated list of audit logs for a user
+      operationId: getUserAudits
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAudits"
+          description: List of user audits
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get user audits
+      tags:
+      - Users
+  /api/v1/users/{userID}/register:
+    post:
+      description: Create a registration transaction for a user
+      operationId: registerUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TX"
+          description: Registration transaction created
+        "404":
+          description: User not found
+        "406":
+          description: User already has passkeys
+      summary: Register user
+      tags:
+      - Users
+  /api/v1/users/{userID}/authenticate:
+    post:
+      description: Create an authentication transaction for a user
+      operationId: authenticateUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebTX"
+        required: false
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TX"
+          description: Authentication transaction created
+        "404":
+          description: User not found
+        "406":
+          description: User has no passkeys
+      summary: Authenticate user
+      tags:
+      - Users
+  /api/v1/users/{userID}/passkey:
+    delete:
+      description: Remove all passkeys for a user
+      operationId: removeUserPasskey
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Passkey removed
+        "404":
+          description: User not found
+      summary: Remove user passkey
+      tags:
+      - Users
+  /api/v1/users/deleted/{userID}:
+    delete:
+      description: Permanently delete a soft-deleted user
+      operationId: destroyUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: User permanently deleted
+        "404":
+          description: User not found
+      summary: Permanently delete user
+      tags:
+      - Users
+    put:
+      description: Restore a soft-deleted user
+      operationId: restoreUser
+      parameters:
+      - explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: User restored
+        "404":
+          description: User not found
+      summary: Restore deleted user
+      tags:
+      - Users
+  /api/v1/companies:
+    get:
+      description: Get paginated list of companies
+      operationId: listCompanies
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Company"
+                type: array
+          description: List of companies
+      summary: List companies
+      tags:
+      - Companies
+    post:
+      description: Create a new company
+      operationId: createCompany
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Company"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+          description: Company created
+      summary: Create company
+      tags:
+      - Companies
+  /api/v1/companies/{id}:
+    delete:
+      description: Delete a company
+      operationId: deleteCompany
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Company deleted
+        "404":
+          description: Company not found
+      summary: Delete company
+      tags:
+      - Companies
+    put:
+      description: Update company details
+      operationId: updateCompany
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Company"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+          description: Company updated
+        "404":
+          description: Company not found
+      summary: Update company
+      tags:
+      - Companies
+  /api/v1/transactions:
+    get:
+      description: Get paginated list of all transactions
+      operationId: listTransactions
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedTransactions"
+          description: List of transactions
+      summary: List transactions
+      tags:
+      - Transactions
+  /api/v1/transactions/{txID}/tags:
+    put:
+      description: Set tags for a specific transaction
+      operationId: setTransactionTags
+      parameters:
+      - explode: false
+        in: path
+        name: txID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/setTransactionTags_request"
+        required: true
+      responses:
+        "200":
+          description: Tags updated
+        "404":
+          description: Transaction not found
+      summary: Set transaction tags
+      tags:
+      - Transactions
+  /api/v1/transactions/{txID}/check:
+    get:
+      description: Get the current status of a transaction
+      operationId: checkTransactionStatus
+      parameters:
+      - explode: false
+        in: path
+        name: txID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/checkTransactionStatus_200_response"
+          description: Transaction status
+      summary: Check transaction status
+      tags:
+      - Transactions
+  /api/v1/transactions/{txID}/history:
+    get:
+      description: Get historical transaction details (including expired)
+      operationId: getTransactionHistory
+      parameters:
+      - explode: false
+        in: path
+        name: txID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+          description: Transaction history
+        "404":
+          description: Transaction not found
+      summary: Get transaction history
+      tags:
+      - Transactions
+  /api/v1/transactions/{txID}/cancel:
+    delete:
+      description: Cancel a pending transaction
+      operationId: cancelTransaction
+      parameters:
+      - explode: false
+        in: path
+        name: txID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Transaction cancelled
+        "400":
+          description: Cannot cancel transaction in current state
+        "403":
+          description: Forbidden
+        "404":
+          description: Transaction not found
+      summary: Cancel transaction
+      tags:
+      - Transactions
+  /api/v1/tags:
+    get:
+      description: List all tags
+      operationId: listTags
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagListReply"
+          description: List of tags
+      summary: List tags
+      tags:
+      - Tags
+    post:
+      description: Create a new tag
+      operationId: createTag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagRequest"
+        required: true
+      responses:
+        "201":
+          description: Tag created
+        "422":
+          $ref: "#/components/responses/ValidationError"
+      summary: Create tag
+      tags:
+      - Tags
+  /api/v1/tags/{tagName}:
+    delete:
+      description: Delete a tag
+      operationId: deleteTag
+      parameters:
+      - explode: false
+        in: path
+        name: tagName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Tag deleted
+        "404":
+          description: Tag not found
+      summary: Delete tag
+      tags:
+      - Tags
+    put:
+      description: |
+        Update a tag. The `values` provided will replace existing values conservatively -  only values that should be deleted or added will change.
+      operationId: updateTag
+      parameters:
+      - explode: false
+        in: path
+        name: tagName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: Tag updated
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          description: Tag not found
+      summary: Update tag
+      tags:
+      - Tags
+  /api/v1/tags/{tagName}/values/{tagValue}:
+    put:
+      description: "Update a single tag value. \n"
+      operationId: updateTagValue
+      parameters:
+      - explode: false
+        in: path
+        name: tagName
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: tagValue
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateTagValue_request"
+        required: true
+      responses:
+        "200":
+          description: Tag value updated
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          description: Tag or value not found
+      summary: Update tag value
+      tags:
+      - Tags
+  /api/v1/audits:
+    get:
+      description: Get paginated list of audit logs
+      operationId: listAudits
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAudits"
+          description: List of audit logs
+      summary: List audits
+      tags:
+      - Audits
+  /api/v1/approval-groups:
+    get:
+      description: Get list of all approval groups
+      operationId: listAuthGroups
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/AuthGroup"
+                type: array
+          description: List of approval groups
+      summary: List approval groups
+      tags:
+      - Approval Groups
+    post:
+      description: Create a new approval group
+      operationId: createAuthGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthGroup"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthGroup"
+          description: Approval group created
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          description: Approval group already exists
+      summary: Create approval group
+      tags:
+      - Approval Groups
+  /api/v1/approval-groups/{id}:
+    delete:
+      description: Delete an approval group by ID
+      operationId: deleteAuthGroup
+      parameters:
+      - description: Approval group ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Approval group deleted
+        "404":
+          description: Approval group not found
+      summary: Delete approval group
+      tags:
+      - Approval Groups
+    get:
+      description: Get an approval group by ID
+      operationId: getAuthGroup
+      parameters:
+      - description: Approval group ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthGroup"
+          description: Approval group
+        "404":
+          description: Approval group not found
+      summary: Get approval group
+      tags:
+      - Approval Groups
+    put:
+      description: Update an approval group
+      operationId: updateAuthGroup
+      parameters:
+      - description: Approval group ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthGroup"
+        required: true
+      responses:
+        "200":
+          description: Approval group updated
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          description: Approval group already exists
+      summary: Update approval group
+      tags:
+      - Approval Groups
+  /api/v1/approval-groups/{id}/tags:
+    put:
+      description: Set tags for a specific approval group
+      operationId: setAuthGroupTags
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/setTransactionTags_request"
+        required: false
+      responses:
+        "200":
+          description: Tags updated
+        "404":
+          description: Approval group not found
+      summary: Set approval group tags
+      tags:
+      - Approval Groups
+  /api/v1/approval-groups/{id}/users/{userID}:
+    delete:
+      description: Remove a user from an approval group by ID
+      operationId: removeUserFromAuthGroup
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: User ID
+        explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: User removed from approval group
+        "404":
+          description: Approval group or user not found
+      summary: Remove user from approval group
+      tags:
+      - Approval Groups
+    post:
+      description: Add a user to an approval group by ID
+      operationId: addUserToAuthGroup
+      parameters:
+      - description: Approval group ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: User ID
+        explode: false
+        in: path
+        name: userID
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: User added to approval group
+        "404":
+          description: Approval group or user not found
+      summary: Add user to approval group
+      tags:
+      - Approval Groups
+  /api/v1/tag-routing-rules:
+    get:
+      description: Get all routing rules
+      operationId: listRoutingRules
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/RoutingRule"
+                type: array
+          description: List of routing rules
+      summary: Get routing rules
+      tags:
+      - Routing Rules
+    post:
+      description: Create a new routing rule
+      operationId: createRoutingRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutingRule"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IDReply"
+          description: Routing rule created
+      summary: Create routing rule
+      tags:
+      - Routing Rules
+  /api/v1/tag-routing-rules/{id}:
+    delete:
+      description: Delete a routing rule by ID
+      operationId: deleteRoutingRule
+      parameters:
+      - description: Routing rule ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Routing rule deleted
+        "404":
+          description: Routing rule not found
+      summary: Delete routing rule
+      tags:
+      - Routing Rules
+    get:
+      description: Get all routing rules
+      operationId: getRoutingRule
+      parameters:
+      - description: Routing rule ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutingRule"
+          description: Routing rule
+      summary: Get routing rules
+      tags:
+      - Routing Rules
+    put:
+      description: Update a routing rule by ID
+      operationId: updateRoutingRule
+      parameters:
+      - description: Routing rule ID
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutingRule"
+        required: true
+      responses:
+        "200":
+          description: Routing rule updated
+      summary: Update routing rule
+      tags:
+      - Routing Rules
+  /api/v1/authorize:
+    post:
+      description: |
+        Authorize a request by tag. The provided tag will be used to find the matching routing rule  and initiate an authentication for that target.
+      operationId: authorize
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorizeRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizeReply"
+          description: Authorization request created
+      summary: Authorize a request
+      tags:
+      - Routing Rules
+  /api/v1/settings:
+    get:
+      description: Get current organization settings
+      operationId: getSettings
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+          description: Organization settings
+      summary: Get organization settings
+      tags:
+      - Settings
+    put:
+      description: Update organization settings
+      operationId: updateSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Settings"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+          description: Settings updated
+      summary: Update organization settings
+      tags:
+      - Settings
+  /api/v1/permissions:
+    get:
+      description: Get list of all permissions
+      operationId: listPermissions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionsReply"
+          description: List of permissions
+      summary: List permissions
+      tags:
+      - Permissions
+    post:
+      description: Create a new permission
+      operationId: createPermission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Permission"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+          description: Permission created
+      summary: Create permission
+      tags:
+      - Permissions
+  /api/v1/permissions/{name}:
+    delete:
+      description: Delete a permission
+      operationId: deletePermission
+      parameters:
+      - explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Permission deleted
+        "404":
+          description: Permission not found
+      summary: Delete permission
+      tags:
+      - Permissions
+    put:
+      description: Rename an existing permission
+      operationId: renamePermission
+      parameters:
+      - explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Permission"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Permission"
+          description: Permission renamed
+        "404":
+          description: Permission not found
+      summary: Rename permission
+      tags:
+      - Permissions
+  /api/v1/permission-groups:
+    get:
+      description: Get list of all permission groups
+      operationId: listPermissionGroups
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionGroupsReply"
+          description: List of permission groups
+      summary: List permission groups
+      tags:
+      - Permission Groups
+    post:
+      description: Create a new permission group
+      operationId: createPermissionGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PermissionGroup"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionGroup"
+          description: Permission group created
+      summary: Create permission group
+      tags:
+      - Permission Groups
+  /api/v1/permission-groups/{id}:
+    delete:
+      description: Delete a permission group
+      operationId: deletePermissionGroup
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Permission group deleted
+        "404":
+          description: Permission group not found
+      summary: Delete permission group
+      tags:
+      - Permission Groups
+    put:
+      description: Rename an existing permission group
+      operationId: renamePermissionGroup
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PermissionGroup"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionGroup"
+          description: Permission group renamed
+        "404":
+          description: Permission group not found
+      summary: Rename permission group
+      tags:
+      - Permission Groups
+  /api/v1/permission-groups/{id}/permissions:
+    put:
+      description: Set the permissions for a permission group
+      operationId: setPermissionGroupPermissions
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/setPermissionGroupPermissions_request"
+        required: true
+      responses:
+        "200":
+          description: Permissions updated
+        "404":
+          description: Permission group not found
+      summary: Set permission group permissions
+      tags:
+      - Permission Groups
+  /api/v1/webhooks:
+    get:
+      description: Retrieve all webhooks configured for the authenticated organization
+      operationId: listWebhooks
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+              - id: 01234567-89ab-cdef-0123-456789abcdef
+                url: https://example.com/webhook
+                secret: my-webhook-secret
+                events:
+                  verify: true
+                  deny: false
+                createdAt: 2024-01-15T10:30:00Z
+              schema:
+                items:
+                  $ref: "#/components/schemas/Webhook"
+                type: array
+          description: Successful response
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      summary: List all webhooks
+      tags:
+      - Webhooks
+    post:
+      description: Create a new webhook configuration for the authenticated organization
+      operationId: createWebhook
+      requestBody:
+        content:
+          application/json:
+            example:
+              url: https://example.com/webhook
+              secret: my-webhook-secret
+              events:
+                verify: true
+                deny: false
+            schema:
+              $ref: "#/components/schemas/WebhookInput"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              example:
+                id: 01234567-89ab-cdef-0123-456789abcdef
+                url: https://example.com/webhook
+                secret: my-webhook-secret
+                events:
+                  verify: true
+                  deny: false
+                createdAt: 2024-01-15T10:30:00Z
+              schema:
+                $ref: "#/components/schemas/Webhook"
+          description: Webhook created successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      summary: Create a new webhook
+      tags:
+      - Webhooks
+  /api/v1/webhooks/{id}:
+    delete:
+      description: Delete an existing webhook configuration
+      operationId: deleteWebhook
+      parameters:
+      - description: The unique identifier of the webhook
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Webhook deleted successfully
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      summary: Delete a webhook
+      tags:
+      - Webhooks
+    put:
+      description: Update an existing webhook configuration
+      operationId: updateWebhook
+      parameters:
+      - description: The unique identifier of the webhook
+        example: 01234567-89ab-cdef-0123-456789abcdef
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            example:
+              url: https://example.com/updated-webhook
+              secret: updated-secret
+              events:
+                verify: true
+                deny: true
+            schema:
+              $ref: "#/components/schemas/WebhookInput"
+        required: true
+      responses:
+        "200":
+          description: Webhook updated successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      summary: Update a webhook
+      tags:
+      - Webhooks
+components:
+  responses:
+    BadRequest:
+      description: Bad request
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Forbidden
+    NotFound:
+      description: Not found
+    ValidationError:
+      description: Validation error
+    InternalServerError:
+      description: Internal server error
+  schemas:
+    User:
+      example:
+        lastName: lastName
+        role: admin
+        groupPermissions:
+        - groupPermissions
+        - groupPermissions
+        hasPasskeys: true
+        permissionGroups:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        messagingPreference: email
+        firstName: firstName
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        phone: phone
+        lastAuthenticated: 2000-01-23T04:56:07.000+00:00
+        permissions:
+        - permissions
+        - permissions
+        company:
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          orgID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: email
+        username: username
+      properties:
+        id:
+          description: Unique user identifier
+          format: uuid
+          readOnly: true
+          type: string
+        role:
+          description: User role
+          enum:
+          - admin
+          - user
+          - super_admin
+          type: string
+        username:
+          description: Display username
+          readOnly: true
+          type: string
+        firstName:
+          description: User first name
+          maxLength: 50
+          minLength: 2
+          type: string
+        lastName:
+          description: User last name
+          maxLength: 50
+          minLength: 2
+          type: string
+        email:
+          description: User email address
+          format: email
+          maxLength: 256
+          type: string
+        phone:
+          description: User phone number
+          maxLength: 20
+          type: string
+        company:
+          $ref: "#/components/schemas/Company"
+        permissions:
+          description: User direct permissions
+          items:
+            maxLength: 64
+            type: string
+          type: array
+        groupPermissions:
+          description: Permissions from groups
+          items:
+            maxLength: 64
+            type: string
+          type: array
+        permissionGroups:
+          description: Permission group IDs
+          items:
+            format: uuid
+            type: string
+          type: array
+        messagingPreference:
+          description: User messaging preference
+          enum:
+          - email
+          - sms
+          - both
+          type: string
+        hasPasskeys:
+          description: Whether user has passkeys configured
+          readOnly: true
+          type: boolean
+        createdAt:
+          description: User creation timestamp
+          format: date-time
+          readOnly: true
+          type: string
+        lastAuthenticated:
+          description: Last authentication timestamp
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - firstName
+      - lastName
+    Company:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        orgID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          description: Company identifier
+          format: uuid
+          type: string
+        orgID:
+          description: Organization identifier
+          format: uuid
+          type: string
+        name:
+          description: Company name
+          maxLength: 100
+          minLength: 2
+          type: string
+        createdAt:
+          description: Company creation timestamp
+          format: date-time
+          readOnly: true
+          type: string
+    Transaction:
+      example:
+        userMessage: userMessage
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        completedAt: 2000-01-23T04:56:07.000+00:00
+        subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        context: context
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        state: pending
+        message: message
+        requestor: requestor
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+        subjectName: subjectName
+      properties:
+        id:
+          description: Transaction identifier
+          format: uuid
+          type: string
+        subject:
+          description: Subject user ID
+          format: uuid
+          type: string
+        subjectName:
+          description: Subject user name
+          type: string
+        state:
+          description: Transaction state
+          enum:
+          - pending
+          - verified
+          - denied
+          - cancelled
+          - expired
+          type: string
+        completedAt:
+          description: Transaction completion timestamp
+          format: date-time
+          type: string
+        requestor:
+          description: Transaction requestor
+          type: string
+        context:
+          description: Transaction context
+          type: string
+        createdAt:
+          description: Transaction creation timestamp
+          format: date-time
+          type: string
+        expiresAt:
+          description: Transaction expiration timestamp
+          format: date-time
+          type: string
+        message:
+          description: Transaction message
+          type: string
+        userMessage:
+          description: User-provided message
+          type: string
+    WebTX:
+      example:
+        message: message
+        connectwise: connectwise
+      properties:
+        message:
+          description: Transaction message
+          maxLength: 1024
+          type: string
+        connectwise:
+          description: ConnectWise reference
+          maxLength: 64
+          type: string
+    TX:
+      example:
+        tx: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        tx:
+          description: Transaction ID
+          format: uuid
+          type: string
+    Audit:
+      example:
+        actor: actor
+        subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: name
+        action: action
+        extras:
+          key: extras
+        created_at: 2000-01-23T04:56:07.000+00:00
+        type: type
+      properties:
+        subject:
+          description: Subject identifier
+          format: uuid
+          type: string
+        name:
+          description: Subject name
+          type: string
+        type:
+          description: Subject type
+          type: string
+        actor:
+          description: Actor performing the action
+          type: string
+        action:
+          description: Action performed
+          type: string
+        extras:
+          additionalProperties:
+            type: string
+          description: Additional audit information
+        created_at:
+          description: Audit entry creation timestamp
+          format: date-time
+          type: string
+    Permission:
+      example:
+        name: name
+      properties:
+        name:
+          description: Permission name
+          maxLength: 64
+          type: string
+      required:
+      - name
+    PermissionsReply:
+      example:
+        permissions:
+        - name: name
+        - name: name
+      properties:
+        permissions:
+          items:
+            $ref: "#/components/schemas/Permission"
+          type: array
+    PermissionGroup:
+      example:
+        permissions:
+        - permissions
+        - permissions
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          description: Permission group identifier
+          format: uuid
+          type: string
+        name:
+          description: Permission group name
+          maxLength: 128
+          type: string
+        permissions:
+          description: Permissions in this group
+          items:
+            maxLength: 64
+            type: string
+          type: array
+      required:
+      - name
+    PermissionGroupsReply:
+      example:
+        groups:
+        - permissions:
+          - permissions
+          - permissions
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - permissions:
+          - permissions
+          - permissions
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        groups:
+          items:
+            $ref: "#/components/schemas/PermissionGroup"
+          type: array
+    Settings:
+      example:
+        scimSecret: scimSecret
+        openID:
+          clientID: clientID
+          clientSecret: clientSecret
+          issuer: https://openapi-generator.tech
+        emailTemplate: emailTemplate
+        smsTemplate: smsTemplate
+        name: name
+        subdomain: subdomain
+        connectWise:
+          privateKey: privateKey
+          companyID: companyID
+          apiVersion: apiVersion
+          serverURL: https://openapi-generator.tech
+          publicKey: publicKey
+          enabled: true
+      properties:
+        subdomain:
+          description: Organization subdomain
+          maxLength: 64
+          minLength: 2
+          type: string
+        name:
+          description: Organization name
+          maxLength: 100
+          type: string
+        openID:
+          $ref: "#/components/schemas/OpenID"
+        scimSecret:
+          description: SCIM API secret
+          maxLength: 256
+          minLength: 24
+          type: string
+        emailTemplate:
+          description: Email notification template
+          maxLength: 1024
+          type: string
+        smsTemplate:
+          description: SMS notification template
+          maxLength: 500
+          type: string
+        connectWise:
+          $ref: "#/components/schemas/ConnectWise"
+    OpenID:
+      example:
+        clientID: clientID
+        clientSecret: clientSecret
+        issuer: https://openapi-generator.tech
+      properties:
+        issuer:
+          description: OpenID Connect issuer URL
+          format: uri
+          maxLength: 1024
+          type: string
+        clientID:
+          description: OpenID Connect client ID
+          maxLength: 256
+          type: string
+        clientSecret:
+          description: OpenID Connect client secret
+          maxLength: 256
+          type: string
+    ConnectWise:
+      example:
+        privateKey: privateKey
+        companyID: companyID
+        apiVersion: apiVersion
+        serverURL: https://openapi-generator.tech
+        publicKey: publicKey
+        enabled: true
+      properties:
+        enabled:
+          description: Whether ConnectWise integration is enabled
+          type: boolean
+        serverURL:
+          description: ConnectWise server URL
+          format: uri
+          maxLength: 1024
+          type: string
+        companyID:
+          description: ConnectWise company ID
+          maxLength: 64
+          type: string
+        publicKey:
+          description: ConnectWise public key
+          maxLength: 256
+          type: string
+        privateKey:
+          description: ConnectWise private key
+          maxLength: 256
+          type: string
+        apiVersion:
+          description: ConnectWise API version
+          maxLength: 16
+          type: string
+    Query:
+      properties:
+        page:
+          description: Page number
+          minimum: 1
+          type: integer
+        perPage:
+          description: Items per page
+          maximum: 100
+          minimum: 1
+          type: integer
+        q:
+          description: Search query
+          type: string
+        permission:
+          description: Filter by permission
+          maxLength: 64
+          type: string
+        sortBy:
+          description: Sort field
+          type: string
+        sortDir:
+          description: Sort direction
+          enum:
+          - asc
+          - desc
+          type: string
+    PaginatedUsers:
+      example:
+        total: 0
+        rows:
+        - lastName: lastName
+          role: admin
+          groupPermissions:
+          - groupPermissions
+          - groupPermissions
+          hasPasskeys: true
+          permissionGroups:
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          messagingPreference: email
+          firstName: firstName
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          phone: phone
+          lastAuthenticated: 2000-01-23T04:56:07.000+00:00
+          permissions:
+          - permissions
+          - permissions
+          company:
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            orgID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          email: email
+          username: username
+        - lastName: lastName
+          role: admin
+          groupPermissions:
+          - groupPermissions
+          - groupPermissions
+          hasPasskeys: true
+          permissionGroups:
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          messagingPreference: email
+          firstName: firstName
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          phone: phone
+          lastAuthenticated: 2000-01-23T04:56:07.000+00:00
+          permissions:
+          - permissions
+          - permissions
+          company:
+            createdAt: 2000-01-23T04:56:07.000+00:00
+            name: name
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            orgID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          email: email
+          username: username
+      properties:
+        rows:
+          items:
+            $ref: "#/components/schemas/User"
+          type: array
+        total:
+          description: Total number of items
+          format: int64
+          type: integer
+    PaginatedTransactions:
+      example:
+        total: 0
+        rows:
+        - userMessage: userMessage
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          context: context
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          state: pending
+          message: message
+          requestor: requestor
+          expiresAt: 2000-01-23T04:56:07.000+00:00
+          subjectName: subjectName
+        - userMessage: userMessage
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          context: context
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          state: pending
+          message: message
+          requestor: requestor
+          expiresAt: 2000-01-23T04:56:07.000+00:00
+          subjectName: subjectName
+      properties:
+        rows:
+          items:
+            $ref: "#/components/schemas/Transaction"
+          type: array
+        total:
+          description: Total number of items
+          format: int64
+          type: integer
+    PaginatedAudits:
+      example:
+        total: 0
+        rows:
+        - actor: actor
+          subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: name
+          action: action
+          extras:
+            key: extras
+          created_at: 2000-01-23T04:56:07.000+00:00
+          type: type
+        - actor: actor
+          subject: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: name
+          action: action
+          extras:
+            key: extras
+          created_at: 2000-01-23T04:56:07.000+00:00
+          type: type
+      properties:
+        rows:
+          items:
+            $ref: "#/components/schemas/Audit"
+          type: array
+        total:
+          description: Total number of items
+          format: int64
+          type: integer
+    Error:
+      properties:
+        error:
+          description: Error message
+          type: string
+        details:
+          description: Error details
+          items:
+            type: string
+          type: array
+    ValidationError:
+      properties:
+        error:
+          description: Validation error message
+          type: string
+        field:
+          description: Field that failed validation
+          type: string
+        value:
+          description: Value that failed validation
+          type: string
+    Webhook:
+      description: A webhook configuration object
+      example:
+        createdAt: 2024-01-15T10:30:00Z
+        authGroupID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        id: 01234567-89ab-cdef-0123-456789abcdef
+        secret: my-webhook-secret
+        url: https://example.com/webhook
+        events:
+          deny: true
+          verify: true
+      properties:
+        id:
+          description: The unique identifier of the webhook
+          example: 01234567-89ab-cdef-0123-456789abcdef
+          format: uuid
+          type: string
+        url:
+          description: The URL where webhook events will be sent
+          example: https://example.com/webhook
+          format: uri
+          maxLength: 2048
+          type: string
+        secret:
+          description: Optional secret used to sign webhook payloads (HMAC-SHA256)
+          example: my-webhook-secret
+          type: string
+        authGroupID:
+          description: Optional approval group ID to associate with the webhook
+          format: uuid
+          type: string
+        events:
+          $ref: "#/components/schemas/Webhook_events"
+        createdAt:
+          description: When the webhook was created
+          example: 2024-01-15T10:30:00Z
+          format: date-time
+          type: string
+      required:
+      - events
+      - id
+      - url
+    WebhookInput:
+      description: Input schema for creating or updating a webhook
+      example:
+        authGroupID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        secret: my-webhook-secret
+        url: https://openapi-generator.tech
+        events:
+          deny: true
+          verify: true
+      properties:
+        url:
+          format: uri
+          type: string
+        secret:
+          description: "Optional secret used to sign webhook payloads (HMAC-SHA256).\
+            \ If a secret is already set, omitting this will preserve the existing\
+            \ secret."
+          example: my-webhook-secret
+          type: string
+        authGroupID:
+          description: Optional approval group ID to associate with the webhook
+          format: uuid
+          type: string
+        events:
+          $ref: "#/components/schemas/Webhook_events"
+      required:
+      - events
+      - url
+    Tag:
+      description: Tag record
+      example:
+        values:
+        - high
+        - high
+        name: priority
+        description: Indicates the priority level
+        id: 01234567-89ab-cdef-0123-456789abcdef
+        enabled: true
+      properties:
+        id:
+          description: The unique identifier of the tag
+          example: 01234567-89ab-cdef-0123-456789abcdef
+          format: uuid
+          type: string
+        name:
+          description: The name of the tag
+          example: priority
+          type: string
+        description:
+          description: The description of the tag
+          example: Indicates the priority level
+          type: string
+        enabled:
+          description: Whether the tag is enabled
+          example: true
+          type: boolean
+        values:
+          description: The value of the tag
+          items:
+            example: high
+            type: string
+          type: array
+    Tags:
+      additionalProperties:
+        type: string
+      description: Map of tag names to values
+    TagsRequest:
+      example:
+        tags:
+          key: tags
+      properties:
+        tags:
+          additionalProperties:
+            type: string
+          description: Map of tag names to values
+    CreateTagRequest:
+      example:
+        values:
+        - values
+        - values
+        name: name
+        description: description
+        enabled: true
+      properties:
+        name:
+          description: The name of the tag
+          type: string
+        description:
+          description: The description of the tag
+          type: string
+        enabled:
+          description: Whether the tag is enabled
+          type: boolean
+        values:
+          items:
+            type: string
+          type: array
+    TagListReply:
+      example:
+        tags:
+        - values:
+          - high
+          - high
+          name: priority
+          description: Indicates the priority level
+          id: 01234567-89ab-cdef-0123-456789abcdef
+          enabled: true
+        - values:
+          - high
+          - high
+          name: priority
+          description: Indicates the priority level
+          id: 01234567-89ab-cdef-0123-456789abcdef
+          enabled: true
+      properties:
+        tags:
+          items:
+            $ref: "#/components/schemas/Tag"
+          type: array
+    TagUpdateRequest:
+      example:
+        values:
+        - values
+        - values
+        name: name
+        description: description
+        enabled: true
+      properties:
+        name:
+          description: The name of the tag
+          type: string
+        description:
+          description: The description of the tag
+          type: string
+        enabled:
+          description: Whether the tag is enabled
+          type: boolean
+        values:
+          items:
+            type: string
+          type: array
+    AuthGroupMember:
+      example:
+        firstName: firstName
+        lastName: lastName
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: email
+      properties:
+        id:
+          description: The unique identifier of the user
+          format: uuid
+          type: string
+        email:
+          description: The email address of the user
+          format: email
+          type: string
+        firstName:
+          description: The first name of the user
+          type: string
+        lastName:
+          description: The last name of the user
+          type: string
+    AuthGroup:
+      example:
+        name: name
+        description: description
+        threshold: 1
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        users:
+        - firstName: firstName
+          lastName: lastName
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          email: email
+        - firstName: firstName
+          lastName: lastName
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          email: email
+      properties:
+        id:
+          description: The unique identifier of the approval group
+          format: uuid
+          type: string
+        name:
+          description: The name of the approval group
+          maxLength: 128
+          type: string
+        threshold:
+          description: The threshold for the approval group
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - any
+          - all
+          type: string
+        description:
+          type: string
+        users:
+          items:
+            $ref: "#/components/schemas/AuthGroupMember"
+          type: array
+      required:
+      - name
+      - threshold
+    IDReply:
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          description: Newly created resource's ID
+          format: uuid
+          type: string
+    RoutingRule:
+      example:
+        targetName: targetName
+        targetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        targetEmail: targetEmail
+        tagValue: tagValue
+        description: description
+        targetType: approval_group
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        tagName: tagName
+      properties:
+        id:
+          format: uuid
+          type: string
+        tagName:
+          description: Name of tag associated with the routing rule
+          type: string
+        tagValue:
+          description: Tag value that must match for this rule to fire
+          type: string
+        description:
+          type: string
+        targetType:
+          description: The type of target for the routing rule
+          enum:
+          - approval_group
+          - user
+          type: string
+        targetId:
+          description: The ID of the target (approval group or user)
+          format: uuid
+          type: string
+        targetEmail:
+          description: The email of the target
+          format: email
+          type: string
+        targetName:
+          description: The name of the target
+          type: string
+      required:
+      - tagName
+      - tagValue
+      - targetId
+      - targetType
+    AuthorizeRequest:
+      example:
+        message: Please approve this financial transaction
+        tag:
+          environment: production
+        context: User initiated transfer
+        payload:
+          amount: 1000
+          currency: USD
+          recipient: john@example.com
+      properties:
+        message:
+          maxLength: 512
+          minLength: 1
+          type: string
+        tag:
+          additionalProperties:
+            type: string
+          maxProperties: 1
+          minProperties: 1
+        context:
+          maxLength: 512
+          type: string
+        payload:
+          additionalProperties: true
+          description: Arbitrary JSON data that gets passed to webhooks
+          type: object
+      required:
+      - message
+      - tag
+    AuthorizeReply:
+      oneOf:
+      - $ref: "#/components/schemas/AuthorizeReply_oneOf"
+      - $ref: "#/components/schemas/AuthorizeReply_oneOf_1"
+    setTransactionTags_request:
+      example:
+        tags:
+          key: tags
+      properties:
+        tags:
+          additionalProperties:
+            type: string
+          description: Map of tag names to values
+    checkTransactionStatus_200_response:
+      example:
+        state: pending
+      properties:
+        state:
+          enum:
+          - pending
+          - verified
+          - denied
+          - cancelled
+          - expired
+          type: string
+    updateTagValue_request:
+      properties:
+        value:
+          description: New value for the tag
+          type: string
+    setPermissionGroupPermissions_request:
+      properties:
+        permissions:
+          items:
+            type: string
+          type: array
+    Webhook_events:
+      example:
+        deny: true
+        verify: true
+      properties:
+        verify:
+          description: "When true, transaction verifications will invoke the webhook"
+          type: boolean
+        deny:
+          description: "When true, transaction denials will invoke the webhook"
+          type: boolean
+    AuthorizeReply_oneOf:
+      description: Transaction response
+      example:
+        txID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        txID:
+          description: Transaction ID for the transaction that's been sent to a user
+          format: uuid
+          type: string
+    AuthorizeReply_oneOf_1:
+      description: Approval response
+      properties:
+        approvalID:
+          description: Approval ID for the approval that's been sent to an approval
+            group
+          format: uuid
+          type: string
+  securitySchemes:
+    basic:
+      scheme: basic
+      type: http
