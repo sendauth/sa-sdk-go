@@ -1,4 +1,4 @@
-# Go API client for sa-sdk-go
+# Go API client for api
 
 Authentication and identity management API for SendAuth platform
 
@@ -23,7 +23,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```go
-import sa-sdk-go "github.com/sendauth/sa-sdk-go"
+import api "github.com/sendauth/sa-sdk-go"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:
@@ -38,18 +38,18 @@ Default configuration comes with `Servers` field that contains server objects as
 
 ### Select Server Configuration
 
-For using other server than the one defined on index 0 set context value `sa-sdk-go.ContextServerIndex` of type `int`.
+For using other server than the one defined on index 0 set context value `api.ContextServerIndex` of type `int`.
 
 ```go
-ctx := context.WithValue(context.Background(), sa-sdk-go.ContextServerIndex, 1)
+ctx := context.WithValue(context.Background(), api.ContextServerIndex, 1)
 ```
 
 ### Templated Server URL
 
-Templated server URL is formatted using default variables from configuration or from context value `sa-sdk-go.ContextServerVariables` of type `map[string]string`.
+Templated server URL is formatted using default variables from configuration or from context value `api.ContextServerVariables` of type `map[string]string`.
 
 ```go
-ctx := context.WithValue(context.Background(), sa-sdk-go.ContextServerVariables, map[string]string{
+ctx := context.WithValue(context.Background(), api.ContextServerVariables, map[string]string{
 	"basePath": "v2",
 })
 ```
@@ -60,13 +60,13 @@ Note, enum values are always validated and all unused variables are silently ign
 
 Each operation can use different server URL defined using `OperationServers` map in the `Configuration`.
 An operation is uniquely identified by `"{classname}Service.{nickname}"` string.
-Similar rules for overriding default operation server index and variables applies by using `sa-sdk-go.ContextOperationServerIndices` and `sa-sdk-go.ContextOperationServerVariables` context maps.
+Similar rules for overriding default operation server index and variables applies by using `api.ContextOperationServerIndices` and `api.ContextOperationServerVariables` context maps.
 
 ```go
-ctx := context.WithValue(context.Background(), sa-sdk-go.ContextOperationServerIndices, map[string]int{
+ctx := context.WithValue(context.Background(), api.ContextOperationServerIndices, map[string]int{
 	"{classname}Service.{nickname}": 2,
 })
-ctx = context.WithValue(context.Background(), sa-sdk-go.ContextOperationServerVariables, map[string]map[string]string{
+ctx = context.WithValue(context.Background(), api.ContextOperationServerVariables, map[string]map[string]string{
 	"{classname}Service.{nickname}": {
 		"port": "8443",
 	},
@@ -193,7 +193,7 @@ Authentication schemes defined for the API:
 Example
 
 ```go
-auth := context.WithValue(context.Background(), sa-sdk-go.ContextBasicAuth, sa-sdk-go.BasicAuth{
+auth := context.WithValue(context.Background(), api.ContextBasicAuth, api.BasicAuth{
 	UserName: "username",
 	Password: "password",
 })
