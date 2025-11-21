@@ -23,6 +23,8 @@ var _ MappedNullable = &AuthorizeRequest{}
 type AuthorizeRequest struct {
 	Message string `json:"message"`
 	Tag map[string]string `json:"tag"`
+	// If requesting authorization on a user's behalf, provide the email to let the approvers know.
+	OnBehalfOf *string `json:"onBehalfOf,omitempty"`
 	Context *string `json:"context,omitempty"`
 	// Arbitrary JSON data that gets passed to webhooks
 	Payload map[string]interface{} `json:"payload,omitempty"`
@@ -95,6 +97,38 @@ func (o *AuthorizeRequest) GetTagOk() (map[string]string, bool) {
 // SetTag sets field value
 func (o *AuthorizeRequest) SetTag(v map[string]string) {
 	o.Tag = v
+}
+
+// GetOnBehalfOf returns the OnBehalfOf field value if set, zero value otherwise.
+func (o *AuthorizeRequest) GetOnBehalfOf() string {
+	if o == nil || IsNil(o.OnBehalfOf) {
+		var ret string
+		return ret
+	}
+	return *o.OnBehalfOf
+}
+
+// GetOnBehalfOfOk returns a tuple with the OnBehalfOf field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AuthorizeRequest) GetOnBehalfOfOk() (*string, bool) {
+	if o == nil || IsNil(o.OnBehalfOf) {
+		return nil, false
+	}
+	return o.OnBehalfOf, true
+}
+
+// HasOnBehalfOf returns a boolean if a field has been set.
+func (o *AuthorizeRequest) HasOnBehalfOf() bool {
+	if o != nil && !IsNil(o.OnBehalfOf) {
+		return true
+	}
+
+	return false
+}
+
+// SetOnBehalfOf gets a reference to the given string and assigns it to the OnBehalfOf field.
+func (o *AuthorizeRequest) SetOnBehalfOf(v string) {
+	o.OnBehalfOf = &v
 }
 
 // GetContext returns the Context field value if set, zero value otherwise.
@@ -173,6 +207,9 @@ func (o AuthorizeRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["message"] = o.Message
 	toSerialize["tag"] = o.Tag
+	if !IsNil(o.OnBehalfOf) {
+		toSerialize["onBehalfOf"] = o.OnBehalfOf
+	}
 	if !IsNil(o.Context) {
 		toSerialize["context"] = o.Context
 	}

@@ -93,7 +93,7 @@ func NewConfiguration() *Configuration {
 		Debug:            false,
 		Servers:          ServerConfigurations{
 			{
-				URL: "https://api.sendauth.com",
+				URL: "https://app.sendauth.com",
 				Description: "No description provided",
 			},
 		},

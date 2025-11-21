@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Message** | **string** |  | 
 **Tag** | **map[string]string** |  | 
+**OnBehalfOf** | Pointer to **string** | If requesting authorization on a user&#39;s behalf, provide the email to let the approvers know. | [optional] 
 **Context** | Pointer to **string** |  | [optional] 
 **Payload** | Pointer to **map[string]interface{}** | Arbitrary JSON data that gets passed to webhooks | [optional] 
 
@@ -67,6 +68,31 @@ and a boolean to check if the value has been set.
 
 SetTag sets Tag field to given value.
 
+
+### GetOnBehalfOf
+
+`func (o *AuthorizeRequest) GetOnBehalfOf() string`
+
+GetOnBehalfOf returns the OnBehalfOf field if non-nil, zero value otherwise.
+
+### GetOnBehalfOfOk
+
+`func (o *AuthorizeRequest) GetOnBehalfOfOk() (*string, bool)`
+
+GetOnBehalfOfOk returns a tuple with the OnBehalfOf field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOnBehalfOf
+
+`func (o *AuthorizeRequest) SetOnBehalfOf(v string)`
+
+SetOnBehalfOf sets OnBehalfOf field to given value.
+
+### HasOnBehalfOf
+
+`func (o *AuthorizeRequest) HasOnBehalfOf() bool`
+
+HasOnBehalfOf returns a boolean if a field has been set.
 
 ### GetContext
 

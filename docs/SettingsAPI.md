@@ -1,6 +1,6 @@
 # \SettingsAPI
 
-All URIs are relative to *https://api.sendauth.com*
+All URIs are relative to *https://app.sendauth.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

@@ -7,7 +7,7 @@ info:
   title: SendAuth API
   version: 1.0.0
 servers:
-- url: https://api.sendauth.com
+- url: https://app.sendauth.com
 security:
 - basic: []
 tags:
@@ -2471,6 +2471,11 @@ components:
             type: string
           maxProperties: 1
           minProperties: 1
+        onBehalfOf:
+          description: "If requesting authorization on a user's behalf, provide the\
+            \ email to let the approvers know."
+          format: email
+          type: string
         context:
           maxLength: 512
           type: string
