@@ -5,7 +5,7 @@ info:
     url: https://sendauth.com
   description: Authentication and identity management API for SendAuth platform
   title: SendAuth API
-  version: 1.0.0
+  version: 0.1.2
 servers:
 - url: https://app.sendauth.com
 security:
@@ -13,6 +13,8 @@ security:
 tags:
 - description: Audit log operations
   name: Audits
+- description: Approval request operations
+  name: Approvals
 - description: Approval group operations
   name: Approval Groups
 - description: Company management operations
@@ -859,6 +861,29 @@ paths:
       summary: List audits
       tags:
       - Audits
+  /api/v1/approvals/{id}:
+    get:
+      description: Get detailed information about an approval request
+      operationId: getApproval
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Approval"
+          description: Approval
+      summary: Get an approval request
+      tags:
+      - Approvals
   /api/v1/approval-groups:
     get:
       description: Get list of all approval groups
@@ -1183,7 +1208,7 @@ paths:
           description: Authorization request created
       summary: Authorize a request
       tags:
-      - Routing Rules
+      - Approvals
   /api/v1/settings:
     get:
       description: Get current organization settings
@@ -2451,6 +2476,62 @@ components:
       - tagValue
       - targetId
       - targetType
+    Approval:
+      example:
+        message: Please approve this production change request
+        tags:
+          environment: production
+        context: User initiated change
+        payload:
+          host: prod-web-01
+          recipient: john@example.com
+      properties:
+        id:
+          description: Approval ID
+          format: uuid
+          type: string
+        state:
+          description: Approval state
+          enum:
+          - pending
+          - verified
+          - denied
+          - cancelled
+          - expired
+          type: string
+        completedAt:
+          description: Approval completion timestamp
+          format: date-time
+          type: string
+        requestor:
+          description: Approval requestor
+          type: string
+        context:
+          description: Approval context
+          type: string
+        createdAt:
+          description: Approval creation timestamp
+          format: date-time
+          type: string
+        message:
+          description: Approval message
+          type: string
+        tags:
+          additionalProperties:
+            type: string
+        onBehalfOf:
+          description: "If requesting authorization on a user's behalf, provide the\
+            \ email to let the approvers know."
+          format: email
+          type: string
+        payload:
+          additionalProperties: true
+          description: Arbitrary JSON data that gets passed to webhooks
+          type: object
+        transactions:
+          items:
+            $ref: "#/components/schemas/Transaction"
+          type: array
     AuthorizeRequest:
       example:
         message: Please approve this financial transaction

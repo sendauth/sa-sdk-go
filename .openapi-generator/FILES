@@ -3,6 +3,7 @@
 README.md
 api/openapi.yaml
 api_approval_groups.go
+api_approvals.go
 api_audits.go
 api_companies.go
 api_permission_groups.go
@@ -15,7 +16,9 @@ api_users.go
 api_webhooks.go
 client.go
 configuration.go
+docs/Approval.md
 docs/ApprovalGroupsAPI.md
+docs/ApprovalsAPI.md
 docs/Audit.md
 docs/AuditsAPI.md
 docs/AuthGroup.md
@@ -68,6 +71,7 @@ docs/WebhooksAPI.md
 git_push.sh
 go.mod
 go.sum
+model_approval.go
 model_audit.go
 model_auth_group.go
 model_auth_group_member.go
@@ -108,4 +112,5 @@ model_webhook.go
 model_webhook_events.go
 model_webhook_input.go
 response.go
+test/api_approvals_test.go
 utils.go

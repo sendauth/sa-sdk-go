@@ -4,79 +4,12 @@ All URIs are relative to *https://app.sendauth.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Authorize**](RoutingRulesAPI.md#Authorize) | **Post** /api/v1/authorize | Authorize a request
 [**CreateRoutingRule**](RoutingRulesAPI.md#CreateRoutingRule) | **Post** /api/v1/tag-routing-rules | Create routing rule
 [**DeleteRoutingRule**](RoutingRulesAPI.md#DeleteRoutingRule) | **Delete** /api/v1/tag-routing-rules/{id} | Delete routing rule
 [**GetRoutingRule**](RoutingRulesAPI.md#GetRoutingRule) | **Get** /api/v1/tag-routing-rules/{id} | Get routing rules
 [**ListRoutingRules**](RoutingRulesAPI.md#ListRoutingRules) | **Get** /api/v1/tag-routing-rules | Get routing rules
 [**UpdateRoutingRule**](RoutingRulesAPI.md#UpdateRoutingRule) | **Put** /api/v1/tag-routing-rules/{id} | Update routing rule
 
-
-
-## Authorize
-
-> AuthorizeReply Authorize(ctx).AuthorizeRequest(authorizeRequest).Execute()
-
-Authorize a request
-
-
-
-### Example
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"os"
-	openapiclient "github.com/sendauth/sa-sdk-go"
-)
-
-func main() {
-	authorizeRequest := *openapiclient.NewAuthorizeRequest("Message_example", map[string]string{"key": "Inner_example"}) // AuthorizeRequest | 
-
-	configuration := openapiclient.NewConfiguration()
-	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.RoutingRulesAPI.Authorize(context.Background()).AuthorizeRequest(authorizeRequest).Execute()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `RoutingRulesAPI.Authorize``: %v\n", err)
-		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-	}
-	// response from `Authorize`: AuthorizeReply
-	fmt.Fprintf(os.Stdout, "Response from `RoutingRulesAPI.Authorize`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiAuthorizeRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **authorizeRequest** | [**AuthorizeRequest**](AuthorizeRequest.md) |  | 
-
-### Return type
-
-[**AuthorizeReply**](AuthorizeReply.md)
-
-### Authorization
-
-[basic](../README.md#basic)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 
 ## CreateRoutingRule
